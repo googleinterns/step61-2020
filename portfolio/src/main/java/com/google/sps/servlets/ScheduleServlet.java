@@ -16,11 +16,12 @@ package com.google.sps.servlets;
 
 import com.google.gson.Gson;
 import com.google.sps.data.*;
+import com.google.sps.data.BaseTaskScheduler.SchedulingAlgorithmType;
 import com.google.sps.data.CalendarEvent;
-import com.google.sps.data.ScheduleRequest;
 import com.google.sps.data.Task;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -40,13 +41,32 @@ public class ScheduleServlet extends HttpServlet {
 
     JSONArray eventsArray = jsonFromRequest.getJSONArray("events");
     JSONArray tasksArray = jsonFromRequest.getJSONArray("tasks");
-    String workHoursStartTimeString = (String) jsonFromRequest.get("startTime");
-    String workHoursEndTimeString = (String) jsonFromRequest.get("endTime");
+    String workHoursStartTimeString = jsonFromRequest.getString("startTime");
+    String workHoursEndTimeString = jsonFromRequest.getString("endTime");
     Instant workHoursStartTime = Instant.parse(workHoursStartTimeString);
     Instant workHoursEndTime = Instant.parse(workHoursEndTimeString);
-
+    String algorithmTypeString = jsonFromRequest.getString("algorithmType");
     Collection<CalendarEvent> events = collectEventsFromJsonArray(eventsArray);
     Collection<Task> tasks = collectTasksFromJsonArray(tasksArray);
+
+    // These are null for initialization purposes. They will either be set or
+    // the program will thrown an error.
+    SchedulingAlgorithmType schedulingAlgorithmType = null;
+    BaseTaskScheduler algorithm = null;
+
+    // This will take the string representation of the algorithm that is passed
+    // in and match it to something in the enum under BaseTaskScheduler.
+    try {
+      schedulingAlgorithmType = SchedulingAlgorithmType.valueOf(algorithmTypeString);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Algorithm type does not exist.");
+    }
+
+    // Here we should add a case for each new algorithm that is implemented.
+    switch (schedulingAlgorithmType) {
+      case SHORTEST_TASK_FIRST:
+        algorithm = new ShortestTaskFirst();
+    }
     Collection<ScheduledTask> scheduledTasks =
         algorithm.schedule(events, tasks, workHoursStartTime, workHoursEndTime);
 
@@ -56,11 +76,11 @@ public class ScheduleServlet extends HttpServlet {
     response.setContentType("application/json");
     response.getWriter().println(resultJson);
   }
-  
+
   // TODO(tomasalvarez): Add tests for this method.
   private static Collection<CalendarEvent> collectEventsFromJsonArray(JSONArray eventsArray) {
     Collection<CalendarEvent> events = new ArrayList<CalendarEvent>();
-    for (Object object: eventsArray) {
+    for (Object object : eventsArray) {
       if (object instanceof JSONObject) {
         JSONObject eventJsonObject = (JSONObject) object;
         String name = eventJsonObject.getString("name");
@@ -72,11 +92,11 @@ public class ScheduleServlet extends HttpServlet {
     }
     return events;
   }
-  
+
   // TODO(tomasalvarez): Add tests for this method.
   private static Collection<Task> collectTasksFromJsonArray(JSONArray tasksArray) {
     Collection<Task> tasks = new ArrayList<Task>();
-    for (Object object: tasksArray) {
+    for (Object object : tasksArray) {
       if (object instanceof JSONObject) {
         JSONObject taskJsonObject = (JSONObject) object;
         String name = taskJsonObject.getString("name");
