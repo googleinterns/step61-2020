@@ -32,17 +32,14 @@ public class ShortestTaskFirst extends BaseTaskScheduler {
    * This method schedules tasks from shortest to longest and returns a ScheduledTask Collection
    * based on the tasks that were able to be scheduled.
    */
-  public Collection<ScheduledTask> schedule(
-      Collection<CalendarEvent> events,
-      Collection<Task> tasks,
-      Instant workHoursStartTime,
-      Instant workHoursEndTime) {
+  public Collection<ScheduledTask> schedule(Collection<CalendarEvent> events,
+      Collection<Task> tasks, Instant workHoursStartTime, Instant workHoursEndTime) {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     List<Task> tasksList = new ArrayList<Task>(tasks);
-    Collections.sort(eventsList, sortByEventStartTimeAscending);
     Collections.sort(tasksList, sortByTaskDurationThenName);
-    List<TimeRange> availableTimes =
-        getEmptyTimeRanges(eventsList, workHoursStartTime, workHoursEndTime);
+    CalendarGroup calendarGroup =
+        new CalendarGroup(eventsList, workHoursStartTime, workHoursEndTime);
+    List<TimeRange> availableTimes = calendarGroup.calculateFreeTimeRanges();
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
     int rangeIndex = 0;
     int taskIndex = 0;
@@ -64,9 +61,8 @@ public class ShortestTaskFirst extends BaseTaskScheduler {
         currentScheduleTime = availableTimeRange.start();
       }
       // The task can be scheduled in the current time range.
-      if (!currentScheduleTime
-          .plusSeconds(task.getDuration().getSeconds())
-          .isAfter(availableTimeRange.end())) {
+      if (!currentScheduleTime.plusSeconds(task.getDuration().getSeconds())
+               .isAfter(availableTimeRange.end())) {
         ScheduledTask scheduledTask = new ScheduledTask(task, currentScheduleTime);
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
