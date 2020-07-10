@@ -115,18 +115,34 @@ public final class ShortestTaskFirstTest {
     Assert.assertEquals(expected, actual);
   }
 
-  // Makes sure that no errors are thrown for events outside working hours.
+  // Makes sure that no errors are thrown for events fully outside working
+  // hours.
   @Test
-  public void eventsOutsideWorkingHours() {
+  public void eventTotallyOutsideWorkingHours() {
     ShortestTaskFirst algorithm = new ShortestTaskFirst();
 
     Collection<CalendarEvent> events =
-        Arrays.asList(new CalendarEvent("Event 1", TIME_1700, TIME_1800));
+        Arrays.asList(new CalendarEvent("Event 1", TIME_1800, TIME_2000));
     Task task1 = new Task("Task 1", "First task", TIME_30_MINUTES, LOW_PRIORITY);
     Collection<Task> tasks = Arrays.asList(task1);
     ScheduledTask scheduledTask1 = new ScheduledTask(task1, TIME_0900);
+    Collection<ScheduledTask> actual = algorithm.schedule(events, tasks, TIME_0900, TIME_1700);
+    Collection<ScheduledTask> expected = Arrays.asList(scheduledTask1);
+    Assert.assertEquals(expected, actual);
+  }
 
-    Collection<ScheduledTask> actual = algorithm.schedule(events, tasks, TIME_0900, TIME_1200);
+  // Makes sure that no errors are thrown for events partially outside working
+  // hours.
+  @Test
+  public void eventPartiallyOutsideWorkingHours() {
+    ShortestTaskFirst algorithm = new ShortestTaskFirst();
+
+    Collection<CalendarEvent> events =
+        Arrays.asList(new CalendarEvent("Event 1", TIME_0830, TIME_0930));
+    Task task1 = new Task("Task 1", "First task", TIME_30_MINUTES, LOW_PRIORITY);
+    Collection<Task> tasks = Arrays.asList(task1);
+    ScheduledTask scheduledTask1 = new ScheduledTask(task1, TIME_0930);
+    Collection<ScheduledTask> actual = algorithm.schedule(events, tasks, TIME_0900, TIME_1700);
     Collection<ScheduledTask> expected = Arrays.asList(scheduledTask1);
     Assert.assertEquals(expected, actual);
   }
