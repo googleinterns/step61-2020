@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ShortestTaskFirst extends BaseTaskScheduler {
+public class ShortestTaskFirstScheduler extends BaseTaskScheduler {
   private static final Comparator<CalendarEvent> sortByEventStartTimeAscending =
       Comparator.comparing(CalendarEvent::getStartTime);
 
@@ -32,8 +32,11 @@ public class ShortestTaskFirst extends BaseTaskScheduler {
    * This method schedules tasks from shortest to longest and returns a ScheduledTask Collection
    * based on the tasks that were able to be scheduled.
    */
-  public Collection<ScheduledTask> schedule(Collection<CalendarEvent> events,
-      Collection<Task> tasks, Instant workHoursStartTime, Instant workHoursEndTime) {
+  public Collection<ScheduledTask> schedule(
+      Collection<CalendarEvent> events,
+      Collection<Task> tasks,
+      Instant workHoursStartTime,
+      Instant workHoursEndTime) {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     List<Task> tasksList = new ArrayList<Task>(tasks);
     Collections.sort(tasksList, sortByTaskDurationThenName);
@@ -61,8 +64,9 @@ public class ShortestTaskFirst extends BaseTaskScheduler {
         currentScheduleTime = availableTimeRange.start();
       }
       // The task can be scheduled in the current time range.
-      if (!currentScheduleTime.plusSeconds(task.getDuration().getSeconds())
-               .isAfter(availableTimeRange.end())) {
+      if (!currentScheduleTime
+          .plusSeconds(task.getDuration().getSeconds())
+          .isAfter(availableTimeRange.end())) {
         ScheduledTask scheduledTask = new ScheduledTask(task, currentScheduleTime);
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
@@ -72,5 +76,9 @@ public class ShortestTaskFirst extends BaseTaskScheduler {
       }
     }
     return scheduledTasks;
+  }
+
+  private static SchedulingAlgorithmType getSchedulingAlgorithmType() {
+    return SchedulingAlgorithmType.SHORTEST_TASK_FIRST;
   }
 }
