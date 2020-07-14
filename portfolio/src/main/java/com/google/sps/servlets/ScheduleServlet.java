@@ -125,7 +125,7 @@ public class ScheduleServlet extends HttpServlet {
       case "SHORTEST_TASK_FIRST":
         return Optional.of(SchedulingAlgorithmType.SHORTEST_TASK_FIRST);
     }
-    return null;
+    return Optional.empty();
   }
 
   private static Optional<BaseTaskScheduler> getAlgorithmOptional(
@@ -139,7 +139,7 @@ public class ScheduleServlet extends HttpServlet {
       case SHORTEST_TASK_FIRST:
         return Optional.of(new ShortestTaskFirstScheduler());
     }
-    return null;
+    return Optional.empty();
   }
 
   private void returnEmptyArrayResponse(HttpServletResponse response) throws IOException {
