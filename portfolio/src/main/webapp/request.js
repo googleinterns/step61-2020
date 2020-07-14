@@ -40,10 +40,7 @@ function createScheduleRequestFromDom() {
   const tasks = collectAllTasks();
   const algorithmType = document.getElementById('algorithm-type').value;
   const scheduleRequest = new ScheduleRequest(
-      events,
-      tasks,
-      getTimeObject(startTime),
-      getTimeObject(endTime),
+      events, tasks, getTimeObject(startTime), getTimeObject(endTime),
       algorithmType);
   return scheduleRequest;
 }
@@ -56,6 +53,7 @@ function onClickStartScheduling() {
   // Create the request to send to the server using the data we collected from
   // the web form.
   fetchScheduledTasksFromServlet(scheduleRequest).then((scheduledTaskArray) => {
+    scheduledTasks = scheduledTaskArray;
     handleScheduledTaskArray(scheduledTaskArray);
   });
 }
@@ -76,12 +74,9 @@ function handleScheduledTaskArray(scheduledTaskArray) {
 function fetchScheduledTasksFromServlet() {
   const scheduleRequest = createScheduleRequestFromDom();
   const json = JSON.stringify(scheduleRequest);
-  return fetch('/schedule', {method: 'POST', body: json})
-      .then((response) => {
-        var array = response.json();
-        scheduledTasks = array;
-        return scheduledTasks;
-      });
+  return fetch('/schedule', {method: 'POST', body: json}).then((response) => {
+    return response.json();
+  });
 }
 
 /**
