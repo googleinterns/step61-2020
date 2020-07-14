@@ -17,15 +17,15 @@ package com.google.sps.servlets;
 import com.google.gson.Gson;
 import com.google.sps.data.*;
 import com.google.sps.data.CalendarEvent;
-import com.google.sps.data.Task;
 import com.google.sps.data.SchedulingAlgorithmType;
+import com.google.sps.data.Task;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -63,7 +63,8 @@ public class ScheduleServlet extends HttpServlet {
       return;
     }
 
-    Optional<BaseTaskScheduler> algorithmOptional = getAlgorithmOptional(schedulingAlgorithmTypeOptional);
+    Optional<BaseTaskScheduler> algorithmOptional =
+        getAlgorithmOptional(schedulingAlgorithmTypeOptional);
     if (!algorithmOptional.isPresent()) {
       response.sendError(
           HttpServletResponse.SC_BAD_REQUEST,
@@ -130,7 +131,7 @@ public class ScheduleServlet extends HttpServlet {
   private static Optional<BaseTaskScheduler> getAlgorithmOptional(
       Optional<SchedulingAlgorithmType> schedulingAlgorithmTypeOptional) {
     // This will always be present because in the doPost we return the method
-    // before the code gets to call this method if this Optional is not 
+    // before the code gets to call this method if this Optional is not
     // present.
     SchedulingAlgorithmType schedulingAlgorithmType = schedulingAlgorithmTypeOptional.get();
     // Here we should add a case for each new algorithm that is implemented.
@@ -141,7 +142,7 @@ public class ScheduleServlet extends HttpServlet {
     return null;
   }
 
-  private void returnEmptyArrayResponse(HttpServletResponse response) throws IOException{
+  private void returnEmptyArrayResponse(HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
     String resultJson = gson.toJson(Arrays.asList());
     response.setContentType("application/json");
