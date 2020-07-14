@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public final class ShortestTaskFirstTest {
+public final class ShortestTaskFirstSchedulerTest {
   private static Instant BEGINNING_OF_DAY = Instant.parse("2020-06-25T00:00:00Z");
   private static Instant END_OF_DAY = Instant.parse("2020-06-25T23:59:59Z");
   private static Instant THREE_DAYS_LATER = Instant.parse("2020-06-28T00:00:00Z");
