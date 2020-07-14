@@ -55,7 +55,7 @@ function onClickStartScheduling() {
   const scheduleRequest = createScheduleRequestFromDom();
   // Create the request to send to the server using the data we collected from
   // the web form.
-  fetchScheduledTasksFromServlet(scheduleRequest).then((scheduledTaskArray) => {
+  fetchScheduledTasksFromServlet().then((scheduledTaskArray) => {
     scheduledTasks = scheduledTaskArray;
     handleScheduledTaskArray(scheduledTaskArray);
   });
