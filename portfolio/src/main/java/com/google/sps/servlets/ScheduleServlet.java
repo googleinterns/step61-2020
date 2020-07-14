@@ -16,12 +16,14 @@ package com.google.sps.servlets;
 
 import com.google.gson.Gson;
 import com.google.sps.data.*;
-import com.google.sps.data.BaseTaskScheduler.SchedulingAlgorithmType;
 import com.google.sps.data.CalendarEvent;
 import com.google.sps.data.Task;
+import com.google.sps.data.SchedulingAlgorithmType;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -49,26 +51,29 @@ public class ScheduleServlet extends HttpServlet {
     Collection<CalendarEvent> events = collectEventsFromJsonArray(eventsArray);
     Collection<Task> tasks = collectTasksFromJsonArray(tasksArray);
 
-    // These are null for initialization purposes. They will either be set or
-    // the program will thrown an error.
-    SchedulingAlgorithmType schedulingAlgorithmType = null;
-    BaseTaskScheduler algorithm = null;
-
-    // This will take the string representation of the algorithm that is passed
-    // in and match it to something in the enum under BaseTaskScheduler.
-    try {
-      schedulingAlgorithmType = SchedulingAlgorithmType.valueOf(algorithmTypeString);
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Algorithm type does not exist.");
+    Optional<SchedulingAlgorithmType> schedulingAlgorithmTypeOptional =
+        getSchedulingAlgorithmTypeOptional(algorithmTypeString);
+    if (!schedulingAlgorithmTypeOptional.isPresent()) {
+      response.sendError(
+          HttpServletResponse.SC_BAD_REQUEST,
+          "The request by the client was syntactically incorrect.");
+      // Here I am returning the empty schedule instead of null to not mess up
+      // any front end code expecting some array.
+      returnEmptyArrayResponse(response);
+      return;
     }
 
-    // Here we should add a case for each new algorithm that is implemented.
-    switch (schedulingAlgorithmType) {
-      case SHORTEST_TASK_FIRST:
-        algorithm = new ShortestTaskFirst();
+    Optional<BaseTaskScheduler> algorithmOptional = getAlgorithmOptional(schedulingAlgorithmTypeOptional);
+    if (!algorithmOptional.isPresent()) {
+      response.sendError(
+          HttpServletResponse.SC_BAD_REQUEST,
+          "The request by the client was syntactically incorrect.");
+      returnEmptyArrayResponse(response);
+      return;
     }
+
     Collection<ScheduledTask> scheduledTasks =
-        algorithm.schedule(events, tasks, workHoursStartTime, workHoursEndTime);
+        algorithmOptional.get().schedule(events, tasks, workHoursStartTime, workHoursEndTime);
 
     Gson gson = new Gson();
     String resultJson = gson.toJson(scheduledTasks);
@@ -110,5 +115,36 @@ public class ScheduleServlet extends HttpServlet {
       }
     }
     return tasks;
+  }
+
+  private static Optional<SchedulingAlgorithmType> getSchedulingAlgorithmTypeOptional(
+      String algorithmTypeString) {
+    // Here we should add a case for each new algorithm that is implemented.
+    switch (algorithmTypeString) {
+      case "SHORTEST_TASK_FIRST":
+        return Optional.of(SchedulingAlgorithmType.SHORTEST_TASK_FIRST);
+    }
+    return null;
+  }
+
+  private static Optional<BaseTaskScheduler> getAlgorithmOptional(
+      Optional<SchedulingAlgorithmType> schedulingAlgorithmTypeOptional) {
+    // This will always be present because in the doPost we return the method
+    // before the code gets to call this method if this Optional is not 
+    // present.
+    SchedulingAlgorithmType schedulingAlgorithmType = schedulingAlgorithmTypeOptional.get();
+    // Here we should add a case for each new algorithm that is implemented.
+    switch (schedulingAlgorithmType) {
+      case SHORTEST_TASK_FIRST:
+        return Optional.of(new ShortestTaskFirstScheduler());
+    }
+    return null;
+  }
+
+  private void returnEmptyArrayResponse(HttpServletResponse response) throws IOException{
+    Gson gson = new Gson();
+    String resultJson = gson.toJson(Arrays.asList());
+    response.setContentType("application/json");
+    response.getWriter().println(resultJson);
   }
 }
