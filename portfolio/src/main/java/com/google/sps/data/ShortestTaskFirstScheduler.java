@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ShortestTaskFirstScheduler extends BaseTaskScheduler {
+class ShortestTaskFirstScheduler implements TaskScheduler {
   private static final Comparator<CalendarEvent> sortByEventStartTimeAscending =
       Comparator.comparing(CalendarEvent::getStartTime);
 
@@ -78,7 +78,7 @@ public class ShortestTaskFirstScheduler extends BaseTaskScheduler {
     return scheduledTasks;
   }
 
-  public static SchedulingAlgorithmType getSchedulingAlgorithmType() {
+  public SchedulingAlgorithmType getSchedulingAlgorithmType() {
     return SchedulingAlgorithmType.SHORTEST_TASK_FIRST;
   }
 }
