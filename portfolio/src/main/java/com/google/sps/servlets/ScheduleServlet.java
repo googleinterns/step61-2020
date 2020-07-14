@@ -56,7 +56,7 @@ public class ScheduleServlet extends HttpServlet {
     if (!schedulingAlgorithmTypeOptional.isPresent()) {
       response.sendError(
           HttpServletResponse.SC_BAD_REQUEST,
-          "The request by the client was syntactically incorrect.");
+          "The request by the client was syntactically incorrect. The algorithm could not be determined.");
       // Here I am returning the empty schedule instead of null to not mess up
       // any front end code expecting some array.
       returnEmptyArrayResponse(response);
@@ -68,7 +68,7 @@ public class ScheduleServlet extends HttpServlet {
     if (!algorithmOptional.isPresent()) {
       response.sendError(
           HttpServletResponse.SC_BAD_REQUEST,
-          "The request by the client was syntactically incorrect.");
+          "The request by the client was syntactically incorrect. The algorithm could not be determined.");
       returnEmptyArrayResponse(response);
       return;
     }
