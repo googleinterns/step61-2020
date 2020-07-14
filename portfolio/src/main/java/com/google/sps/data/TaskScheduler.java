@@ -17,9 +17,9 @@ package com.google.sps.data;
 import java.time.Instant;
 import java.util.Collection;
 
-public abstract class BaseTaskScheduler {
+public interface TaskScheduler {
   /** This is the scheduling method that all algorithm classes should implement. */
-  public abstract Collection<ScheduledTask> schedule(
+  public Collection<ScheduledTask> schedule(
       Collection<CalendarEvent> events,
       Collection<Task> tasks,
       Instant workHoursStartTime,
@@ -29,5 +29,5 @@ public abstract class BaseTaskScheduler {
    * This method returns the algorithm type from the enum that corresponds to the particular
    * algorithm.
    */
-  public abstract SchedulingAlgorithmType getSchedulingAlgorithmType();
+  public SchedulingAlgorithmType getSchedulingAlgorithmType();
 }
