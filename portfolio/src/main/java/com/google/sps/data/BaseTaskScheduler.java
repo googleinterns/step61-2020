@@ -18,17 +18,13 @@ import java.time.Instant;
 import java.util.Collection;
 
 public abstract class BaseTaskScheduler {
-
   /** This is the scheduling method that all algorithm classes should implement. */
-  public abstract Collection<ScheduledTask> schedule(
-      Collection<CalendarEvent> events,
-      Collection<Task> tasks,
-      Instant workHoursStartTime,
-      Instant workHoursEndTime);
+  public abstract Collection<ScheduledTask> schedule(Collection<CalendarEvent> events,
+      Collection<Task> tasks, Instant workHoursStartTime, Instant workHoursEndTime);
 
   /**
    * This method returns the algorithm type from the enum that corresponds to the particular
    * algorithm.
    */
-  abstract SchedulingAlgorithmType getSchedulingAlgorithmType();
+  public abstract SchedulingAlgorithmType getSchedulingAlgorithmType();
 }
