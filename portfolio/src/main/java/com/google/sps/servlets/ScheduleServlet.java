@@ -68,7 +68,7 @@ public class ScheduleServlet extends HttpServlet {
     if (!algorithmOptional.isPresent()) {
       response.sendError(
           HttpServletResponse.SC_BAD_REQUEST,
-          "The request by the client was syntactically incorrect. The algorithm could not be determined.");
+          "The request by the client was syntactically incorrect. The task scheduler could not be determined.");
       returnEmptyArrayResponse(response);
       return;
     }
