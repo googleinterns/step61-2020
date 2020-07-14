@@ -17,16 +17,18 @@ package com.google.sps.data;
 import java.time.Instant;
 import java.util.Collection;
 
-// TODO: Add test coverage for scheduling algorithms
 public abstract class BaseTaskScheduler {
-  public enum SchedulingAlgorithmType {
-    SHORTEST_TASK_FIRST
-  }
 
-  /** This is the abstract method that all algorithm classes should implement. */
+  /** This is the scheduling method that all algorithm classes should implement. */
   public abstract Collection<ScheduledTask> schedule(
       Collection<CalendarEvent> events,
       Collection<Task> tasks,
       Instant workHoursStartTime,
       Instant workHoursEndTime);
+
+  /**
+   * This method returns the algorithm type from the enum that corresponds to the particular
+   * algorithm.
+   */
+  abstract SchedulingAlgorithmType getSchedulingAlgorithmType();
 }
