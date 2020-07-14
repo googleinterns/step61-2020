@@ -78,7 +78,7 @@ public class ShortestTaskFirstScheduler extends BaseTaskScheduler {
     return scheduledTasks;
   }
 
-  private static SchedulingAlgorithmType getSchedulingAlgorithmType() {
+  public static SchedulingAlgorithmType getSchedulingAlgorithmType() {
     return SchedulingAlgorithmType.SHORTEST_TASK_FIRST;
   }
 }
