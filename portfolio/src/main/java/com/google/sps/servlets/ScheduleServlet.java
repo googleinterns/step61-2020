@@ -17,10 +17,7 @@ package com.google.sps.servlets;
 import com.google.gson.Gson;
 import com.google.sps.data.*;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,31 +42,31 @@ public class ScheduleServlet extends HttpServlet {
     Instant workHoursStartTime = Instant.parse(workHoursStartTimeString);
     Instant workHoursEndTime = Instant.parse(workHoursEndTimeString);
     String algorithmTypeString = jsonFromRequest.getString("algorithmType");
-    Collection<CalendarEvent> events = ServletUtils.collectEventsFromJsonArray(eventsArray);
-    Collection<Task> tasks = ServletUtils.collectTasksFromJsonArray(tasksArray);
+    Collection<CalendarEvent> events = ServletHelper.collectEventsFromJsonArray(eventsArray);
+    Collection<Task> tasks = ServletHelper.collectTasksFromJsonArray(tasksArray);
 
     Optional<SchedulingAlgorithmType> schedulingAlgorithmTypeOptional =
-        ServletUtils.getSchedulingAlgorithmTypeOptional(algorithmTypeString);
+        SchedulingAlgorithmReference.getSchedulingAlgorithmTypeOptional(algorithmTypeString);
     if (!schedulingAlgorithmTypeOptional.isPresent()) {
       response.sendError(
           HttpServletResponse.SC_BAD_REQUEST,
           "The request by the client was syntactically incorrect. The algorithm could not be determined.");
       // Here I am returning the empty schedule instead of null to not mess up
       // any front end code expecting some array.
-      ServletUtils.returnEmptyArrayResponse(response);
+      ServletHelper.returnEmptyArrayResponse(response);
       return;
     }
 
     Optional<TaskScheduler> taskSchedulerOptional =
-        ServletUtils.getTaskSchedulerOptional(schedulingAlgorithmTypeOptional);
+        SchedulingAlgorithmReference.getTaskSchedulerOptional(schedulingAlgorithmTypeOptional);
     if (!taskSchedulerOptional.isPresent()) {
       response.sendError(
           HttpServletResponse.SC_BAD_REQUEST,
           "The request by the client was syntactically incorrect. The algorithm could not be determined.");
-      ServletUtils.returnEmptyArrayResponse(response);
+      ServletHelper.returnEmptyArrayResponse(response);
       return;
     }
-    
+
     Collection<ScheduledTask> scheduledTasks =
         taskSchedulerOptional.get().schedule(events, tasks, workHoursStartTime, workHoursEndTime);
 
