@@ -40,12 +40,9 @@ function createScheduleRequestFromDom() {
   const endTime = document.getElementById('working-hour-end').value;
   const events = collectAllEvents();
   const tasks = collectAllTasks();
-  const algorithmType = document.getElementById('algorithm-type').value;
+  const algorithmType = 'SHORTEST_TASK_FIRST';
   const scheduleRequest = new ScheduleRequest(
-      events,
-      tasks,
-      getTimeObject(startTime),
-      getTimeObject(endTime),
+      events, tasks, getTimeObject(startTime), getTimeObject(endTime),
       algorithmType);
   return scheduleRequest;
 }
@@ -77,23 +74,28 @@ function collectAllScheduledTasks() {
   const allScheduledTasks = new Array();
   // Get scheduled task list element to run through cards collecting data.
   const scheduledTaskList = document.getElementById('schedule-result-list');
-  
+
   scheduledTaskList.childNodes.forEach((scheduledTaskCard) => {
     // The cardBody of the scheduledTaskCard
     const cardBody = scheduledTaskCard.childNodes[0];
 
     const scheduledTaskName = cardBody.childNodes[0].innerText;
-    const scheduledTaskScheduledTime = cardBody.childNodes[1].innerText.substring(SCHEDULED_TIME_INITIAL_TEXT.length);
-    const scheduledTaskDurationMinutes = parseInt(cardBody.childNodes[2].innerText.substring(DURATION_INITIAL_TEXT.length));
-    const scheduledTaskDescription = cardBody.childNodes[3].innerText.substring(DESCRIPTION_INITIAL_TEXT.length);
-    const scheduledTaskPriority = parseInt(cardBody.childNodes[4].innerText.substring(PRIORITY_INITIAL_TEXT.length));
+    const scheduledTaskScheduledTime =
+        cardBody.childNodes[1].innerText.substring(
+            SCHEDULED_TIME_INITIAL_TEXT.length);
+    const scheduledTaskDurationMinutes =
+        parseInt(cardBody.childNodes[2].innerText.substring(
+            DURATION_INITIAL_TEXT.length));
+    const scheduledTaskDescription = cardBody.childNodes[3].innerText.substring(
+        DESCRIPTION_INITIAL_TEXT.length);
+    const scheduledTaskPriority =
+        parseInt(cardBody.childNodes[4].innerText.substring(
+            PRIORITY_INITIAL_TEXT.length));
 
     var scheduledTask = {};
     const task = new Task(
-        scheduledTaskName,
-        scheduledTaskDescription,
-        scheduledTaskDurationMinutes,
-        scheduledTaskPriority);
+        scheduledTaskName, scheduledTaskDescription,
+        scheduledTaskDurationMinutes, scheduledTaskPriority);
 
     scheduledTask.task = task;
     scheduledTask.date = scheduledTaskScheduledTime;
@@ -109,10 +111,9 @@ function collectAllScheduledTasks() {
 function fetchScheduledTasksFromServlet() {
   const scheduleRequest = createScheduleRequestFromDom();
   const json = JSON.stringify(scheduleRequest);
-  return fetch('/schedule', {method: 'POST', body: json})
-      .then((response) => {
-        return response.json();
-      });
+  return fetch('/schedule', {method: 'POST', body: json}).then((response) => {
+    return response.json();
+  });
 }
 
 /**
@@ -148,7 +149,7 @@ function addScheduledTaskToDom(scheduledTask) {
   timeText.innerText = SCHEDULED_TIME_INITIAL_TEXT + taskDate;
   cardBody.appendChild(timeText);
 
-  
+
   const durationText = document.createElement('p');
   durationText.classList.add('card-text');
   durationText.innerText = DURATION_INITIAL_TEXT + taskDurationMinutes;
