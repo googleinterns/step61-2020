@@ -133,7 +133,6 @@ function addScheduledTaskToDom(scheduledTask) {
 
   const newResultCard = document.createElement('div');
   newResultCard.classList.add('card');
-  newResultCard.id = "new-result-card";
 
   const cardBody = document.createElement('div');
   cardBody.classList.add('card-body');
