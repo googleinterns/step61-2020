@@ -80,6 +80,14 @@ function createNewCalendarEventUserInput() {
     document.getElementById('new-event-name').value = EVENT_DEFAULT_NAME;
   }
 }
+
+/** Shows the "Event added" header. */
+function showEventAddedHeader() { 
+  const $eventListHeader = $('#event-added-header');
+  if ($eventListHeader.hasClass('d-none')) {
+    $eventListHeader.removeClass('d-none');
+  }
+}
  
 /**
  * Creates a Date object based on a string that represents a time in HH:MM
@@ -100,6 +108,8 @@ function getTimeObject(timeString) {
  
 /** Creates a card element for a new calendar event. */
 function updateCalendarEventList(newCalendarEvent) {
+  showEventAddedHeader();
+
   const newEventCard = document.createElement('div');
   newEventCard.classList.add('card');
  
@@ -156,7 +166,7 @@ function collectAllEvents() {
     const event = new CalendarEvent(eventName, startTime, endTime);
     return event;
   });
- 
+
   return allEventsOnPage;
 }
  
@@ -280,9 +290,50 @@ function getClosestNextHour(nextHour, workHourStartString, workHourEndString) {
 
   return closestHour; 
 }
+
+/** 
+ * Sets the default working hour start time based on user picked date
+ * and the current time.
+ * If user picked today to schedule for, 
+ * The default working hour start time is the next closest hour,
+ * or the defualt working hour end time (5pm) if next hour is past end time. 
+ */
+function setWorkingHour() {
+  const userPickedDate = getUserPickedDateFromDom();
+  const $workingHourEndString = $('#working-hour-end').val(); 
+  const workingHourEnd = parseInt($workingHourEndString.split(':')[0]); 
+
+  // Default working hour start time is 9 AM. 
+  const workingHourStartDefault = 9; 
+
+  var closestHour; 
+
+  if (isToday(userPickedDate)) {
+    const now = new Date();
+    var nextHour = now.getHours() + 1;
+    closestHour = nextHour; 
+    if (nextHour <= workingHourStartDefault) {
+      closestHour = '09:00';
+    } else if (nextHour >= workingHourEnd) {
+      closestHour = $workingHourEndString;
+    } else {
+      if (nextHour < 10) {
+        closestHour = '0' + nextHour;
+      }
+      closestHour += ':00';
+    }
+  } else {
+    closestHour = '09:00';  
+  }
+
+  const $workingHourStart = $('#working-hour-start'); 
+  $workingHourStart.val(closestHour); 
+}
  
 /** Checks the validity of the user's working hours input. */
 function checkWorkingHourRange() {
+  const $startSchedulingButton = $('#start-scheduling-button');
+
   const workHourStartParts = $('#working-hour-start').val().split(':'); 
   const workHourStartHour =
       parseInt(workHourStartParts[0]);
@@ -298,8 +349,10 @@ function checkWorkingHourRange() {
   if (!isWorkingHourValid(
         workHourStartHour, workHourEndHour, workHourStartMinute, workHourEndMinute)) {
     $workHourWarning.removeClass('d-none').text('Working hours are not valid.');
+    $startSchedulingButton.attr('disabled', 'disabled'); 
   } else {
     $workHourWarning.empty().addClass('d-none');
+    $startSchedulingButton.removeAttr('disabled', 'disabled');
     // Only sets the default times for calendar events if
     // the inputted working hours are valid.
     setNewEventStartAndEndTimes();
@@ -319,13 +372,17 @@ function isWorkingHourValid(
  
 /** Checks if the date the user has picked is before the current date. */
 function checkDatePicker() {
+  const $startSchedulingButton = $('#start-scheduling-button');
+
   const pickedDate = getUserPickedDateFromDom();
   const now = new Date();
  
   if (pickedDate.getTime() < now.getTime()) {
     $('#date-picker-warning').removeClass('d-none');
+    $startSchedulingButton.attr('disabled', 'disabled');
   } else {
     $('#date-picker-warning').addClass('d-none');
+    $startSchedulingButton.removeAttr('disabled', 'disabled');
   }
 }
 
