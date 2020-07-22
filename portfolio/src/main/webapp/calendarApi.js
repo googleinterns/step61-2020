@@ -154,10 +154,12 @@ function addNewEventsToGoogleCalendar() {
 
     const taskStartTimeMilliseconds = Date.parse(scheduledTask.date);
     const taskStartTime = new Date();
-    // This is x1000 because the functions takes milliseconds
+
     taskStartTime.setTime(taskStartTimeMilliseconds);
 
     const taskEndTime = new Date();
+
+    // This is x1000 because the functions takes milliseconds
     taskEndTime.setTime(taskStartTimeMilliseconds + (task.duration * 60 * 1000)); 
 
     const currentScheduledTask = {

@@ -73,6 +73,11 @@ function handleAuthClick() {
   }
 }
 
+/**
+ * When the page loads, a listener is set for the signIn 
+ * status that calls this function when it changes. So
+ * when a user logs in or out, the UI gets update.
+ */
 function updateSigninStatus(isSignedIn) {
   if (isSignedIn) {
     var $importCalendarMessage = $('#import-auth-message');
