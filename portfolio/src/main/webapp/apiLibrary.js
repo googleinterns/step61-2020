@@ -112,9 +112,9 @@ function handleImportAuthError(e) {
 }
 
 /**
- * If current use is signed in and authorized,
- * for read-only access to any of the APIs, 
- * hide the log-in button and show log-out button for that API.
+ * If current user is signed in and authorized
+ * for read-only access to the APIs, 
+ * hide the log-in button and show log-out button.
  * Otherwise, the user needs to log in and/or authorize. 
  */
 function handleApiButtons() {
